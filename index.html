@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arduino AI Project Maker</title>
+    <title>مشاريع اردوينو الذكية</title>
     <!-- استدعاء خط عربي حديث -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- مكتبة الأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --primary-color: #00e5ff; /* لون نيون سماوي */
-            --secondary-color: #7000ff; /* لون نيون بنفسجي */
-            --bg-color: #0a0a0a;
-            --glass-bg: rgba(255, 255, 255, 0.05);
+            --primary-color: #00e5ff; /* سماوي نيون */
+            --secondary-color: #bc13fe; /* بنفسجي نيون */
+            --bg-color: #050505;
+            --glass-bg: rgba(20, 20, 20, 0.85);
             --text-color: #ffffff;
+            --accent-green: #00ff88;
         }
 
         * {
@@ -25,53 +28,62 @@
 
         body {
             background-color: var(--bg-color);
+            /* خلفية شبكية خفيفة لتعطي طابع تقني */
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
             color: var(--text-color);
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* تنسيق العنوان المضيء */
+        /* --- الهيدر المضيء --- */
         header {
             text-align: center;
-            padding: 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            padding: 25px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
             position: absolute;
             width: 100%;
-            z-index: 10;
+            z-index: 50;
         }
 
         h1.glowing-text {
             font-size: 2.5rem;
             color: #fff;
-            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 2px;
             text-shadow: 
                 0 0 5px #fff,
                 0 0 10px #fff,
                 0 0 20px var(--primary-color),
                 0 0 40px var(--primary-color),
                 0 0 80px var(--primary-color);
-            animation: flicker 1.5s infinite alternate;
+            animation: textFlicker 3s infinite alternate;
         }
 
-        @keyframes flicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        @keyframes textFlicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
                 text-shadow: 
-                    0 0 5px #fff,
-                    0 0 10px #fff,
-                    0 0 20px var(--primary-color),
-                    0 0 40px var(--primary-color),
-                    0 0 80px var(--primary-color);
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px var(--primary-color),
+                0 0 40px var(--primary-color);
             }
-            20%, 24%, 55% {        
+            20%, 24%, 55% {       
                 text-shadow: none;
+                opacity: 0.5;
             }
         }
 
-        /* تنسيق السلايدر */
-        .slider-container {
+        /* --- السلايدر --- */
+        .slider-wrapper {
             width: 100%;
-            height: 60vh;
+            height: 55vh;
             position: relative;
             overflow: hidden;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
         }
 
         .slide {
@@ -81,61 +93,74 @@
             top: 0;
             left: 0;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 1s ease-in-out, transform 4s ease;
             background-size: cover;
             background-position: center;
+            transform: scale(1);
         }
 
         .slide.active {
             opacity: 1;
+            transform: scale(1.05); /* زووم بطيء */
         }
 
         .slide::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(0deg, var(--bg-color) 0%, rgba(0,0,0,0.2) 100%);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(0deg, var(--bg-color) 5%, rgba(0,0,0,0.3) 100%);
         }
 
-        /* الحاوية الرئيسية */
-        .main-container {
-            max-width: 800px;
-            margin: -50px auto 50px auto;
-            padding: 30px;
+        /* --- الحاوية الرئيسية --- */
+        .main-card {
+            max-width: 90%;
+            width: 700px;
+            margin: -80px auto 50px auto;
+            padding: 40px;
             background: var(--glass-bg);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
-            z-index: 20;
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
+            z-index: 60;
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.15);
+            transition: all 0.4s ease;
         }
 
-        /* العناصر التفاعلية */
+        /* --- خطوات التنقل --- */
         .step {
             display: none;
-            animation: fadeIn 0.5s ease;
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         .step.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- العناصر والادخال --- */
+        h2 {
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
         }
 
         input[type="text"], input[type="tel"] {
             width: 100%;
-            padding: 15px;
-            margin: 15px 0;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid var(--secondary-color);
-            border-radius: 10px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #333;
+            border-radius: 12px;
             color: #fff;
             font-size: 1.1rem;
             outline: none;
@@ -143,161 +168,142 @@
         }
 
         input:focus {
-            box-shadow: 0 0 15px var(--secondary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
         }
 
+        /* --- الأزرار --- */
         .btn {
-            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
             border: none;
-            padding: 15px 40px;
+            padding: 15px;
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
-            transition: 0.3s;
+            margin-top: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
             text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
         }
 
         .btn-outline {
             background: transparent;
             border: 2px solid var(--primary-color);
-            margin-bottom: 10px;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 10px;
+            color: var(--primary-color);
+            box-shadow: none;
         }
 
-        /* تنسيق الجدول */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* --- الجدول --- */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            overflow: hidden;
+            background: rgba(30, 30, 30, 0.9);
         }
 
         th, td {
-            padding: 15px;
+            padding: 18px;
             text-align: right;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         th {
-            background: rgba(112, 0, 255, 0.3);
+            background: linear-gradient(90deg, #2a004e, #1a1a1a);
             color: var(--primary-color);
+            font-size: 1.1rem;
         }
 
-        /* التحميل */
-        .loader {
-            border: 5px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
-            border-top: 5px solid var(--primary-color);
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        tr:last-child td { border-bottom: none; }
+
+        /* --- لودر التحميل --- */
+        .loader-box {
+            text-align: center;
+            padding: 40px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* علامة الصح */
-        .success-checkmark {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-        }
-        
-        .check-icon {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            border-radius: 50%;
-            box-sizing: content-box;
-            border: 4px solid #4CAF50;
-        }
-        
-        .check-icon::before {
-            top: 3px;
-            left: -2px;
-            width: 30px;
-            transform-origin: 100% 50%;
-            border-radius: 100px 0 0 100px;
-        }
-        
-        .check-icon::after {
-            top: 0;
-            left: 30px;
+        .spinner {
             width: 60px;
-            transform-origin: 0 50%;
-            border-radius: 0 100px 100px 0;
-            animation: rotate-circle 4.25s ease-in;
-        }
-        
-        .check-line {
-            display: block;
-            position: absolute;
-            z-index: 10;
-            height: 5px;
-            background-color: #4CAF50;
-            border-radius: 2px;
-            transition: background-color .2s ease;
-        }
-        
-        .line-tip {
-            top: 46px;
-            left: 14px;
-            width: 25px;
-            transform: rotate(45deg);
-            animation: icon-line-tip 0.75s;
-        }
-        
-        .line-long {
-            top: 38px;
-            right: 8px;
-            width: 47px;
-            transform: rotate(-45deg);
-            animation: icon-line-long 0.75s;
-        }
-        
-        @keyframes icon-line-tip {
-            0% { width: 0; left: 1px; top: 19px; }
-            54% { width: 0; left: 1px; top: 19px; }
-            70% { width: 50px; left: -8px; top: 37px; }
-            84% { width: 17px; left: 21px; top: 48px; }
-            100% { width: 25px; left: 14px; top: 46px; }
-        }
-        
-        @keyframes icon-line-long {
-            0% { width: 0; right: 46px; top: 54px; }
-            65% { width: 0; right: 46px; top: 54px; }
-            84% { width: 55px; right: 0px; top: 35px; }
-            100% { width: 47px; right: 8px; top: 38px; }
+            height: 60px;
+            margin: 0 auto 20px;
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 15px var(--primary-color);
         }
 
-        .whatsapp-box {
-            background-color: #25D366;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- أيقونة النجاح --- */
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-green);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 30px var(--accent-green);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* --- واتساب --- */
+        .whatsapp-card {
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
             text-decoration: none;
             display: block;
-            text-align: center;
-            font-weight: bold;
+            color: white;
+            transition: 0.3s;
+            border: 1px solid #4ade80;
+        }
+        
+        .whatsapp-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4);
         }
 
     </style>
@@ -305,79 +311,88 @@
 <body>
 
     <header>
-        <h1 class="glowing-text">مختبر المستقبل</h1>
+        <h1 class="glowing-text">مشاريع اردوينو</h1>
     </header>
 
-    <!-- Slider Section -->
-    <div class="slider-container">
-        <!-- Image 1 -->
+    <!-- سلايدر الصور -->
+    <div class="slider-wrapper">
         <div class="slide active" style="background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSggeFi0IC7v-YyL06nAIaCi8ToOF54fQsRmoJiUbU0Q6YajWRSNYKWcRWPf75EHDVZheKVumi1gPoSthTFXsE6vLAom098NpcD2CqyM5aPpO1hRJaad9YSFlm91-eUvdKMzQx2qxfRJniCKPuN1an3B02yVDC2eILp8ocF8BkCZfHdL70TJejLBSnfLI/s933/starterkit_02.unbox_934x700.jpg');"></div>
-        <!-- Image 2 -->
         <div class="slide" style="background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhMePBEZS60F0TaiOLxSli-YTntU-YEXe0VCq8FA-C7EBpIFI2mytirT9Wl65wRFkfGQs7jMY1DmZFwhcNLCb8Yxuab6M0YjiC3yMUeggR9Egh07ThP_veHW8rnM8kcjQpmpuOdM-1ZLet2UyHyAZg-jKSyypZ_vRqQg_iThNS3a-QmCu9iMgmQyNvMHzo/s600/arduino-kit-600x600.jpg');"></div>
-        <!-- Image 3 -->
         <div class="slide" style="background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi4xumqEgwyDrDvrEELG19Ih03j9St5z_29jfEMbB2JT5e-lgHf8qi1vRujdctc96j0s_HtYP6RGvp2ZDwZrNPHAHb2h2oDb0Rsazs-EsW7KjTjXxJSyNiznUavd_F4lKf3C7QLzdKTx5H4eCfKdqWZ3_RNr4MDZ8EXFzuqwmU1UBwFAzPnWGDCCapWkHU/s1000/qq.jpg');"></div>
     </div>
 
-    <div class="main-container">
+    <!-- المحتوى -->
+    <div class="main-card">
         
-        <!-- Step 1: Input -->
+        <!-- الخطوة 1: ادخال الاسم -->
         <div id="step-1" class="step active">
-            <h2>ما هو مشروعك القادم؟</h2>
-            <p style="color: #ccc; margin-bottom: 15px;">ادخل اسم المشروع (مثال: كاشف غاز، نظام ري ذكي...)</p>
-            <input type="text" id="projectInput" placeholder="اسم المشروع هنا...">
-            <button class="btn" onclick="getComponents()">التالي <span style="font-size:1.2em">🤖</span></button>
+            <h2><i class="fas fa-microchip"></i> ابدأ مشروعك الإلكتروني</h2>
+            <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
+                ادخل اسم المشروع (مثال: كاشف غاز، سيارة بلوتوث، نظام ري ذكي...)
+            </p>
+            <div class="input-group">
+                <input type="text" id="projectInput" placeholder="اكتب اسم المشروع هنا..." autocomplete="off">
+            </div>
+            <button class="btn" onclick="analyzeProject()">
+                تحليل بالذكاء الاصطناعي <i class="fas fa-magic"></i>
+            </button>
         </div>
 
-        <!-- Step 2: Loading -->
-        <div id="step-loading" class="step" style="text-align: center;">
-            <div class="loader"></div>
-            <h3>الذكاء الاصطناعي يقوم بتحليل المشروع وتجهيز قائمة المعدات...</h3>
+        <!-- الخطوة 2: جاري التحميل -->
+        <div id="step-loading" class="step">
+            <div class="loader-box">
+                <div class="spinner"></div>
+                <h3>جاري معالجة البيانات وتحديد المكونات...</h3>
+                <p style="color:#aaa; font-size:0.9rem">يتم البحث في قاعدة البيانات الهندسية</p>
+            </div>
         </div>
 
-        <!-- Step 3: Result Table -->
+        <!-- الخطوة 3: الجدول -->
         <div id="step-3" class="step">
-            <h2 style="color: var(--primary-color);">قائمة المعدات المطلوبة:</h2>
-            <div id="table-container">
-                <!-- Table will be injected here -->
+            <h2><i class="fas fa-list-check"></i> قائمة المكونات المطلوبة</h2>
+            <div class="table-container" id="table-result">
+                <!-- سيتم وضع الجدول هنا -->
             </div>
             <br>
-            <h3>هل تريد هذا الـ Package؟</h3>
-            <button class="btn" onclick="nextStep('step-3', 'step-4')">نعم، أريد هذا البكج</button>
+            <h3 style="text-align: center; font-size: 1.2rem;">هل تريد شراء هذا الـ Package كاملاً؟</h3>
+            <button class="btn" onclick="goToStep('step-4')">نعم، أريد البكج <i class="fas fa-box-open"></i></button>
         </div>
 
-        <!-- Step 4: Schematic Question -->
+        <!-- الخطوة 4: المخطط -->
         <div id="step-4" class="step">
-            <h2>هل تريد مخطط توصيل جاهز (Schematic)؟</h2>
+            <h2>مخطط التوصيل (Schematic)</h2>
+            <div style="text-align: center; margin: 30px 0;">
+                <i class="fas fa-project-diagram" style="font-size: 5rem; color: var(--secondary-color); text-shadow: 0 0 20px var(--secondary-color);"></i>
+                <p style="margin-top: 20px; color: #ccc;">هل تريد إرفاق مخطط توصيل احترافي مطبوع مع الطلب؟</p>
+            </div>
             <div class="btn-group">
-                <button class="btn" onclick="selectSchematic(true)">نعم</button>
-                <button class="btn btn-outline" onclick="selectSchematic(false)">لا</button>
+                <button class="btn" onclick="goToStep('step-5')">نعم، أرفق المخطط</button>
+                <button class="btn btn-outline" onclick="goToStep('step-5')">لا شكراً</button>
             </div>
         </div>
 
-        <!-- Step 5: User Info Form -->
+        <!-- الخطوة 5: البيانات -->
         <div id="step-5" class="step">
-            <h2>بيانات الشحن</h2>
+            <h2><i class="fas fa-truck"></i> معلومات التوصيل</h2>
             <input type="text" id="fullName" placeholder="الاسم الكامل">
-            <input type="text" id="address" placeholder="العنوان (المدينة، الحي)">
-            <input type="tel" id="phone" placeholder="رقم الهاتف">
-            <button class="btn" onclick="confirmOrder()">تأكيد الطلب</button>
+            <input type="text" id="address" placeholder="العنوان (الولاية، المدينة، الشارع)">
+            <input type="tel" id="phone" placeholder="رقم الهاتف (05/06/07...)">
+            <button class="btn" onclick="submitOrder()">تأكيد وإرسال الطلب <i class="fas fa-paper-plane"></i></button>
         </div>
 
-        <!-- Step 6: Success -->
+        <!-- الخطوة 6: النجاح -->
         <div id="step-6" class="step" style="text-align: center;">
-            <div class="success-checkmark">
-                <div class="check-icon">
-                    <span class="check-line line-tip"></span>
-                    <span class="check-line line-long"></span>
-                </div>
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
             </div>
-            <h2 style="margin-top: 20px;">تم الطلب بنجاح!</h2>
-            <p>سيتم تجهيز طلبك في أقرب وقت.</p>
+            <h2 style="color: var(--accent-green); margin-bottom: 10px;">تم الطلب بنجاح!</h2>
+            <p style="color: #ccc;">رقم طلبك: #<span id="orderId"></span></p>
             
-            <div class="notification" style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
-                <p>اذا أردت مساعدة في برمجة مشروعك تواصل معنا:</p>
-                <a href="https://wa.me/213559293773" class="whatsapp-box">
-                    رقم واتساب: 0559293773
+            <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <p style="margin-bottom: 15px;">اذا أردت مساعدة في برمجة مشروعك أو تجميعه تواصل معنا:</p>
+                <a href="https://wa.me/213559293773" class="whatsapp-card" target="_blank">
+                    <i class="fab fa-whatsapp" style="font-size: 1.5rem; vertical-align: middle; margin-left: 10px;"></i>
+                    <span style="vertical-align: middle; font-size: 1.2rem;">0559293773</span>
                 </a>
             </div>
         </div>
@@ -385,99 +400,124 @@
     </div>
 
     <script>
-        // === Logic for Slider ===
-        let currentSlide = 0;
+        // --- منطق السلايدر ---
+        let slideIndex = 0;
         const slides = document.querySelectorAll('.slide');
         
-        function nextSlide() {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
+        function showSlides() {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}
+            slides[slideIndex - 1].classList.add('active');
+            setTimeout(showSlides, 3000); // تغيير الصورة كل 3 ثواني
         }
+        showSlides();
 
-        setInterval(nextSlide, 2000); // كل 2 ثانية
-
-        // === Logic for App ===
-        const apiKey = "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"; 
+        // --- منطق التطبيق الذكي ---
         
-        // Navigation Helper
-        function nextStep(currentId, nextId) {
-            document.getElementById(currentId).classList.remove('active');
-            document.getElementById(nextId).classList.add('active');
+        function goToStep(stepId) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
         }
 
-        // AI Function
-        async function getComponents() {
-            const projectName = document.getElementById('projectInput').value;
-            if (!projectName) {
-                alert("الرجاء إدخال اسم المشروع");
+        // قاعدة بيانات ذكية محلية (لتجنب أخطاء الاتصال)
+        const projectsDB = {
+            "غاز": [
+                {comp: "Arduino Uno R3", qty: "1", desc: "لوحة التحكم"},
+                {comp: "Gas Sensor MQ-2", qty: "1", desc: "حساس الغاز والدخان"},
+                {comp: "Buzzer", qty: "1", desc: "صافرة إنذار"},
+                {comp: "LED Red & Green", qty: "2", desc: "مؤشرات ضوئية"},
+                {comp: "Breadboard", qty: "1", desc: "لوحة تجارب"},
+                {comp: "Jumper Wires", qty: "20", desc: "أسلاك توصيل"}
+            ],
+            "سيارة": [
+                {comp: "Arduino Uno", qty: "1", desc: "العقل المدبر"},
+                {comp: "Motor Driver L298N", qty: "1", desc: "متحكم المحركات"},
+                {comp: "DC Motors + Wheels", qty: "4", desc: "محركات وعجلات"},
+                {comp: "Chassis Kit", qty: "1", desc: "هيكل السيارة"},
+                {comp: "Bluetooth HC-05", qty: "1", desc: "للتحكم بالهاتف"},
+                {comp: "Batteries 18650", qty: "2", desc: "مصدر طاقة"}
+            ],
+            "ري": [
+                {comp: "Arduino Nano", qty: "1", desc: "متحكم صغير"},
+                {comp: "Soil Moisture Sensor", qty: "1", desc: "حساس رطوبة التربة"},
+                {comp: "Relay Module 5V", qty: "1", desc: "لفتح وغلق المضخة"},
+                {comp: "Water Pump 5V", qty: "1", desc: "مضخة مياه صغيرة"},
+                {comp: "Tubing", qty: "1m", desc: "أنبوب مياه"},
+                {comp: "LCD I2C Display", qty: "1", desc: "شاشة عرض الحالة"}
+            ],
+            "عام": [
+                {comp: "Arduino Uno Starter Kit", qty: "1", desc: "حقيبة شاملة"},
+                {comp: "Set of Sensors", qty: "1", desc: "مجموعة حساسات متنوعة"},
+                {comp: "Resistors Box", qty: "1", desc: "علبة مقاومات"},
+                {comp: "LEDs Pack", qty: "1", desc: "مجموعة ليدات"},
+                {comp: "USB Cable", qty: "1", desc: "كابل برمجة"},
+                {comp: "Breadboard Large", qty: "1", desc: "لوحة توصيل كبيرة"}
+            ]
+        };
+
+        function analyzeProject() {
+            const input = document.getElementById('projectInput').value.toLowerCase();
+            if (!input) {
+                alert("الرجاء كتابة اسم المشروع أولاً!");
                 return;
             }
 
-            nextStep('step-1', 'step-loading');
+            goToStep('step-loading');
 
-            // تجهيز الطلب للذكاء الاصطناعي
-            const prompt = `
-                بصفتك خبير إلكترونيات وأردوينو. المستخدم يريد عمل مشروع: "${projectName}".
-                قم بإنشاء جدول HTML فقط (بدون أي نصوص إضافية خارج الجدول) يحتوي على الأعمدة: المكون، الكمية، الوظيفة.
-                يجب أن يكون الجدول بتنسيق HTML صالح داخل <table> <thead>...</thead> <tbody>...</tbody> </table>.
-                تأكد أن النصوص باللغة العربية.
-            `;
+            // محاكاة الذكاء الاصطناعي (تأخير زمني ليبدو كأنه يفكر)
+            setTimeout(() => {
+                let components = projectsDB["عام"]; // الافتراضي
+                
+                // البحث عن كلمات مفتاحية
+                if (input.includes("غاز") || input.includes("دخان") || input.includes("حريق")) components = projectsDB["غاز"];
+                else if (input.includes("سيارة") || input.includes("روبوت") || input.includes("تتبع")) components = projectsDB["سيارة"];
+                else if (input.includes("ري") || input.includes("زراعة") || input.includes("سقي")) components = projectsDB["ري"];
 
-            try {
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        messages: [{ role: "user", content: prompt }],
-                        model: "llama3-8b-8192", // نموذج سريع ومجاني
-                        temperature: 0.5
-                    })
+                // بناء الجدول
+                let tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المكون</th>
+                                <th>الكمية</th>
+                                <th>الوظيفة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                components.forEach(item => {
+                    tableHTML += `
+                        <tr>
+                            <td>${item.comp}</td>
+                            <td>${item.qty}</td>
+                            <td>${item.desc}</td>
+                        </tr>
+                    `;
                 });
 
-                const data = await response.json();
-                const aiContent = data.choices[0].message.content;
-
-                // استخراج الجدول من النص (في حال أضاف الذكاء الاصطناعي نصوصاً أخرى)
-                let tableHTML = aiContent;
-                // تنظيف بسيط في حال وجود markdown
-                tableHTML = tableHTML.replace(/```html/g, '').replace(/```/g, '');
-
-                document.getElementById('table-container').innerHTML = tableHTML;
+                tableHTML += `</tbody></table>`;
+                document.getElementById('table-result').innerHTML = tableHTML;
                 
-                nextStep('step-loading', 'step-3');
-
-            } catch (error) {
-                console.error("Error:", error);
-                alert("حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. تأكد من الانترنت.");
-                nextStep('step-loading', 'step-1');
-            }
+                goToStep('step-3');
+            }, 2000); // 2 ثانية انتظار
         }
 
-        // Schematic Selection
-        let wantsSchematic = false;
-        function selectSchematic(choice) {
-            wantsSchematic = choice;
-            nextStep('step-4', 'step-5');
-        }
-
-        // Confirm Order
-        function confirmOrder() {
+        function submitOrder() {
             const name = document.getElementById('fullName').value;
-            const address = document.getElementById('address').value;
             const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
 
-            if (!name || !address || !phone) {
-                alert("الرجاء ملء جميع البيانات");
+            if (!name || !phone || !address) {
+                alert("يرجى إكمال جميع بيانات الشحن");
                 return;
             }
 
-            // هنا يمكن إضافة كود لإرسال البيانات إلى قاعدة بيانات أو إيميل
-            // حالياً سننتقل لشاشة النجاح فقط
-            nextStep('step-5', 'step-6');
+            // توليد رقم طلب عشوائي
+            document.getElementById('orderId').innerText = Math.floor(Math.random() * 10000) + 5000;
+            
+            goToStep('step-6');
         }
 
     </script>
